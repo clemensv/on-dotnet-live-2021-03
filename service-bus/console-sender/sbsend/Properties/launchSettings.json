@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "sbsend": {
+      "commandName": "Project",
+      "commandLineArgs": "-n clemensvams.servicebus.windows.net -e foo -c 100 -w 500"
+    }
+  }
+}
