@@ -67,22 +67,24 @@ namespace sbrcv
             var processor = client.CreateProcessor(EntityName,
                 new ServiceBusProcessorOptions()
                 {
-                    AutoCompleteMessages = true,
+                    AutoCompleteMessages = false,
                     MaxConcurrentCalls = this.ConcurrentCalls,
                     ReceiveMode = this.ReceiveDelete? ServiceBusReceiveMode.ReceiveAndDelete:ServiceBusReceiveMode.PeekLock, 
-                    PrefetchCount = this.PrefetchCount
+                    PrefetchCount = this.PrefetchCount,
+                    MaxAutoLockRenewalDuration = TimeSpan.FromMinutes(2)
                 });
             processor.ProcessMessageAsync += async args =>
             {
                 if (!string.IsNullOrEmpty(args.Message.SessionId) || 
                     !string.IsNullOrEmpty(args.Message.Subject))
                 {
-                    int color = string.IsNullOrEmpty(args.Message.SessionId) ? args.Message.Subject.GetHashCode():args.Message.SessionId.GetHashCode();
+                    int color = Math.Abs(string.IsNullOrEmpty(args.Message.SessionId) ? args.Message.Subject.GetHashCode():args.Message.SessionId.GetHashCode());
                     Console.BackgroundColor = ConsoleColor.Black;
-                    Console.ForegroundColor = (ConsoleColor)(color % 15)+1;
+                    Console.ForegroundColor = (ConsoleColor)((color % 14)+1);
                 }
                 Console.Write("[]");
                 messages.Add(args.Message);
+                await args.CompleteMessageAsync(args.Message);
             };
             processor.ProcessErrorAsync += async args =>
             {
