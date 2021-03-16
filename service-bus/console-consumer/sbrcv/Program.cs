@@ -60,7 +60,8 @@ namespace sbrcv
                 bagStart = sw.ElapsedMilliseconds;
 
                 messages = new ConcurrentBag<ServiceBusReceivedMessage>();
-                Console.WriteLine($"Received {snapshot.Count} in {bagDuration} ms");
+                Console.ResetColor();
+                Console.WriteLine($"\nReceived {snapshot.Count} in {bagDuration} ms");
             }, null, 10000,10000);
             
             var processor = client.CreateProcessor(EntityName,
@@ -73,7 +74,14 @@ namespace sbrcv
                 });
             processor.ProcessMessageAsync += async args =>
             {
-                Console.Write(".");
+                if (!string.IsNullOrEmpty(args.Message.SessionId) || 
+                    !string.IsNullOrEmpty(args.Message.Subject))
+                {
+                    int color = string.IsNullOrEmpty(args.Message.SessionId) ? args.Message.Subject.GetHashCode():args.Message.SessionId.GetHashCode();
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    Console.ForegroundColor = (ConsoleColor)(color % 15)+1;
+                }
+                Console.Write("[]");
                 messages.Add(args.Message);
             };
             processor.ProcessErrorAsync += async args =>

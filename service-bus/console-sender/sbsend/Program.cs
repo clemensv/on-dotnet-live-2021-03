@@ -16,6 +16,8 @@
 
     class Program
     {
+        Random rnd = new Random();
+
         public static Task<int> Main(string[] args)
             => CommandLineApplication.ExecuteAsync<Program>(args);
 
@@ -45,7 +47,6 @@
         private async Task OnExecuteAsync()
         {
             
-            Random rnd = new Random();
             Stopwatch sw = Stopwatch.StartNew();
             ConcurrentBag<double> sendDurations = new ConcurrentBag<double>();
             ConcurrentBag<Task> pendingSends = new ConcurrentBag<Task>();
@@ -69,10 +70,7 @@
                 {
                     // first message is sent sync to start the connection
                     long sendStart = sw.ElapsedMilliseconds;
-                    var message = new ServiceBusMessage(payload)
-                    {
-                        TimeToLive = TimeSpan.FromMinutes(2)
-                    };
+                    var message = CreateServiceBusMessage(payload);
                     await sender.SendMessageAsync(message);
                     sendDurations.Add(sw.ElapsedMilliseconds - sendStart);
 
@@ -80,10 +78,7 @@
                     for (int i = 1; i < Count; i++)
                     {
                         sendStart = sw.ElapsedMilliseconds;
-                        message = new ServiceBusMessage(payload)
-                        {
-                            TimeToLive = TimeSpan.FromMinutes(2)
-                        };
+                        message = CreateServiceBusMessage(payload);
                         pendingSends.Add(sender.SendMessageAsync(message).ContinueWith(task =>
                         {
                             sendDurations.Add(sw.ElapsedMilliseconds - sendStart);
@@ -96,10 +91,7 @@
                     for (int i = 0; i < Count; i++)
                     {
                         long sendStart = sw.ElapsedMilliseconds;
-                        var message = new ServiceBusMessage(payload)
-                        {
-                            TimeToLive = TimeSpan.FromMinutes(2)
-                        };
+                        var message = CreateServiceBusMessage(payload);
                         await sender.SendMessageAsync(message);
                         sendDurations.Add(sw.ElapsedMilliseconds - sendStart);
 
@@ -117,10 +109,7 @@
                     var batch = await sender.CreateMessageBatchAsync();
                     for (int i = 0; i < Count; i++)
                     {
-                        var message = new ServiceBusMessage(payload)
-                        {
-                            TimeToLive = TimeSpan.FromMinutes(2)
-                        };
+                        var message = CreateServiceBusMessage(payload);
 
                         if (batch.Count >= BatchSize || !batch.TryAddMessage(message))
                         {
@@ -152,11 +141,7 @@
                     var batch = await sender.CreateMessageBatchAsync();
                     for (int i = 0; i < Count; i++)
                     {
-                        var message = new ServiceBusMessage(payload)
-                        {
-                            TimeToLive = TimeSpan.FromMinutes(2)
-                        };
-
+                        var message = CreateServiceBusMessage(payload);
                         if (batch.Count >= BatchSize || !batch.TryAddMessage(message))
                         {
                             // batch is full, send the batch, make a new one, and add this message there
@@ -203,5 +188,14 @@
             Console.WriteLine($"50% {sendDurations.Quantile(0.5):F} ms, 95% {sendDurations.Quantile(0.95):F} ms, 99% {sendDurations.Quantile(0.99):F} ms, 99.9 % { sendDurations.Quantile(0.999):F} ms");
         }
 
+        ServiceBusMessage CreateServiceBusMessage(byte[] payload)
+        {
+            var message = new ServiceBusMessage(payload)
+            {
+                TimeToLive = TimeSpan.FromMinutes(2),
+                Subject = (rnd.Next(int.MaxValue)).ToString()
+            };
+            return message;
+        }
     }
 }
