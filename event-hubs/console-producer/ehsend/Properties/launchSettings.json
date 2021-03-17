@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ehsend": {
+      "commandName": "Project",
+      "commandLineArgs": "-n clemensv90.servicebus.windows.net -e clemensv1 -c 10000 -a"
+    }
+  }
+}
