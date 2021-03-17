@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "sbrcv-t1": {
+      "commandName": "Project",
+      "commandLineArgs": "-n clemensvams.servicebus.windows.net -e foo -c 1 -p 100 "
+    }
+  }
+}

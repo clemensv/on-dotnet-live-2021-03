@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>sbrcv_t1</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.3.0" />
+    <PackageReference Include="mathnet.numerics" Version="4.15.0" />
+    <PackageReference Include="mcmaster.extensions.commandlineutils" Version="3.1.0" />
+    <PackageReference Include="microsoft.azure.servicebus" Version="5.1.2" />
+  </ItemGroup>
+
+</Project>

@@ -193,7 +193,8 @@
             var message = new ServiceBusMessage(payload)
             {
                 TimeToLive = TimeSpan.FromMinutes(2),
-                Subject = (rnd.Next(int.MaxValue)).ToString()
+                Subject = (rnd.Next(int.MaxValue)).ToString(),
+                SessionId = rnd.Next(16).ToString()
             };
             return message;
         }
