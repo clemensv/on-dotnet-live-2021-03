@@ -207,7 +207,7 @@ namespace sbrcv
                     }
                 }
                 while (message != null && !cts.IsCancellationRequested);
-                await receiver.CloseAsync();
+                receiver.CloseAsync();
             }
             while (!cts.IsCancellationRequested);
 

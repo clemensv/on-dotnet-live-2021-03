@@ -2,7 +2,7 @@
   "profiles": {
     "sbrcv": {
       "commandName": "Project",
-      "commandLineArgs": "-n clemensvams.servicebus.windows.net -e queue-s -c 1 -p 100 -s -d -x"
+      "commandLineArgs": "-n clemensvams.servicebus.windows.net -e queue-a -x"
     }
   }
 }

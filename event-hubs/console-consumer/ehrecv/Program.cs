@@ -48,6 +48,9 @@ namespace ehrcv
         [Option(ShortName = "p", LongName = "prefetch-count", Description = "Prefetch count")]
         public int PrefetchCount { get; } = 0;
 
+        [Option(ShortName = "y", LongName = "greedy", Description = "Greedy balancing strategy")]
+        public bool Greedy { get; }
+
 
         private async Task OnExecuteAsync()
         {
@@ -63,7 +66,8 @@ namespace ehrcv
             var options = new EventProcessorClientOptions()
             {
                 PrefetchCount = this.PrefetchCount,
-                LoadBalancingStrategy = LoadBalancingStrategy.Balanced,
+                LoadBalancingStrategy = this.Greedy? LoadBalancingStrategy.Greedy : LoadBalancingStrategy.Balanced,
+                LoadBalancingUpdateInterval = TimeSpan.FromSeconds(10)
             };
             var processor = new EventProcessorClient(storageClient, this.ConsumerGroupName, NamespaceName, EntityName, cred, options);
             var partitionEventCount = new ConcurrentDictionary<string, int>();

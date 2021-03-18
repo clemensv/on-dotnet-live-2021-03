@@ -72,7 +72,8 @@
                     // first message is sent sync to start the connection
                     long sendStart = sw.ElapsedMilliseconds;
                     var message = CreateEvent(payload);
-                    await sender.SendAsync(new [] {message});
+            
+                    await sender.SendAsync(new [] {message}, new SendEventOptions() { PartitionKey = rnd.Next(32).ToString() });
                     sendDurations.Add(sw.ElapsedMilliseconds - sendStart);
 
                     // into the loop!
@@ -80,7 +81,7 @@
                     {
                         sendStart = sw.ElapsedMilliseconds;
                         message = CreateEvent(payload);
-                        pendingSends.Add(sender.SendAsync(new[] { message }).ContinueWith(task =>
+                        pendingSends.Add(sender.SendAsync(new[] { message }, new SendEventOptions() { PartitionKey = rnd.Next(32).ToString() }).ContinueWith(task =>
                         {
                             sendDurations.Add(sw.ElapsedMilliseconds - sendStart);
                         }));
@@ -93,7 +94,7 @@
                     {
                         long sendStart = sw.ElapsedMilliseconds;
                         var message = CreateEvent(payload);
-                        await sender.SendAsync(new[] { message });
+                        await sender.SendAsync(new[] { message }, new SendEventOptions() { PartitionKey = rnd.Next(32).ToString() });
                         sendDurations.Add(sw.ElapsedMilliseconds - sendStart);
 
                         if (Wait > 0)
@@ -107,7 +108,7 @@
             {
                 if (AsyncCompletion)
                 {
-                    var batch = await sender.CreateBatchAsync();
+                    var batch = await sender.CreateBatchAsync(new CreateBatchOptions() { PartitionKey = rnd.Next(32).ToString() });
                     for (int i = 0; i < Count; i++)
                     {
                         var message = CreateEvent(payload);
@@ -139,7 +140,7 @@
                 }
                 else
                 {
-                    var batch = await sender.CreateBatchAsync();
+                    var batch = await sender.CreateBatchAsync(new CreateBatchOptions() { PartitionKey = rnd.Next(32).ToString() });
                     for (int i = 0; i < Count; i++)
                     {
                         var message = CreateEvent(payload);
